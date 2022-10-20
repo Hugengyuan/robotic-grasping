@@ -216,7 +216,6 @@ def run():
     if not os.path.exists(save_folder):
         os.makedirs(save_folder)
     tb = tensorboardX.SummaryWriter(save_folder)
-    logging.info('Log files were saved to dir %s'.format(save_folder))
     
     # Save commandline args
     if args is not None:
@@ -244,6 +243,10 @@ def run():
     # Get the compute device
     device = get_device(args.force_cpu)
 
+    
+    logging.info('Log files were saved to dir {}'.format(save_folder))
+    
+    
     # Load Dataset
     logging.info('Loading {} Dataset...'.format(args.dataset.title()))
     Dataset = get_dataset(args.dataset)
