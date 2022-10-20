@@ -216,6 +216,7 @@ def run():
     if not os.path.exists(save_folder):
         os.makedirs(save_folder)
     tb = tensorboardX.SummaryWriter(save_folder)
+    print(save_folder)
 
     # Save commandline args
     if args is not None:
