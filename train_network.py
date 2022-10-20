@@ -212,11 +212,12 @@ def run():
     dt = datetime.datetime.now().strftime('%y%m%d_%H%M')
     net_desc = '{}_{}'.format(dt, '_'.join(args.description.split()))
 
-    save_folder = os.path.join(args.logdir, net_desc)
+    save_folder = os.path.join('/kaggle/working/logs', net_desc)
     if not os.path.exists(save_folder):
         os.makedirs(save_folder)
     tb = tensorboardX.SummaryWriter(save_folder)
-
+    logging.info('Log files were saved to dir %s'.format(save_folder))
+    
     # Save commandline args
     if args is not None:
         params_path = os.path.join(save_folder, 'commandline_args.json')
