@@ -81,9 +81,6 @@ if __name__ == '__main__':
     logging.root.handlers = []
     logging.basicConfig(
         level=logging.INFO,
-        filename="{0}/{1}.log".format(save_folder, 'log'),
-        format='[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s',
-        datefmt='%H:%M:%S'
     )
     # set up logging to console
     console = logging.StreamHandler()
