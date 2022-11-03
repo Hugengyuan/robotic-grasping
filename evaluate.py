@@ -1,3 +1,5 @@
+import datetime
+import json
 import argparse
 import logging
 import time
@@ -76,7 +78,21 @@ if __name__ == '__main__':
 
     # Get the compute device
     device = get_device(args.force_cpu)
-
+    logging.root.handlers = []
+    logging.basicConfig(
+        level=logging.INFO,
+        filename="{0}/{1}.log".format(save_folder, 'log'),
+        format='[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s',
+        datefmt='%H:%M:%S'
+    )
+    # set up logging to console
+    console = logging.StreamHandler()
+    console.setLevel(logging.DEBUG)
+    # set a format which is simpler for console use
+    formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+    console.setFormatter(formatter)
+    # add the handler to the root logger
+    logging.getLogger('').addHandler(console)
     # Load Dataset
     logging.info('Loading {} Dataset...'.format(args.dataset.title()))
     Dataset = get_dataset(args.dataset)
