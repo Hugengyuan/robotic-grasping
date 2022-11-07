@@ -61,10 +61,10 @@ class GenerativeResnet(GraspModel):
         x7 = self.res4(x6)
         x8 = self.res5(x7)
         context_1 = torch.cat((x3_dsc, x8), 1)
-        context_2 = torch.cat((x2_dsc, x7), 1)
-        context_3 = torch.cat((x1_dsc, x6), 1)
         x9 = F.relu(self.bn4(self.conv4(context_1)))
+        context_2 = torch.cat((x2_dsc, x9), 1)
         x10 = F.relu(self.bn5(self.conv5(context_2)))
+        context_3 = torch.cat((x1_dsc, x10), 1)
         x11 = self.conv6(context_3)
 
         if self.dropout:
