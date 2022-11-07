@@ -1,8 +1,8 @@
 import torch.nn as nn
 import torch.nn.functional as F
-
+import torch
 from inference.models.grasp_model import GraspModel, ResidualBlock
-
+from .DSC import DSC_Module
 
 class GenerativeResnet(GraspModel):
 
@@ -10,13 +10,13 @@ class GenerativeResnet(GraspModel):
         super(GenerativeResnet, self).__init__()
         self.conv1 = nn.Conv2d(input_channels, channel_size, kernel_size=9, stride=1, padding=4)
         self.bn1 = nn.BatchNorm2d(channel_size)
-
+        self.conv1_dsc = DSC_Module(channel_size, channel_size);
         self.conv2 = nn.Conv2d(channel_size, channel_size * 2, kernel_size=4, stride=2, padding=1)
         self.bn2 = nn.BatchNorm2d(channel_size * 2)
-
+        self.conv2_dsc = DSC_Module(channel_size * 2, channel_size * 2);
         self.conv3 = nn.Conv2d(channel_size * 2, channel_size * 4, kernel_size=4, stride=2, padding=1)
         self.bn3 = nn.BatchNorm2d(channel_size * 4)
-
+        self.conv3_dsc = DSC_Module(channel_size * 4, channel_size * 4);
         self.res1 = ResidualBlock(channel_size * 4, channel_size * 4)
         self.res2 = ResidualBlock(channel_size * 4, channel_size * 4)
         self.res3 = ResidualBlock(channel_size * 4, channel_size * 4)
@@ -49,27 +49,33 @@ class GenerativeResnet(GraspModel):
                 nn.init.xavier_uniform_(m.weight, gain=1)
 
     def forward(self, x_in):
-        x = F.relu(self.bn1(self.conv1(x_in)))
-        x = F.relu(self.bn2(self.conv2(x)))
-        x = F.relu(self.bn3(self.conv3(x)))
-        x = self.res1(x)
-        x = self.res2(x)
-        x = self.res3(x)
-        x = self.res4(x)
-        x = self.res5(x)
-        x = F.relu(self.bn4(self.conv4(x)))
-        x = F.relu(self.bn5(self.conv5(x)))
-        x = self.conv6(x)
+        x1 = F.relu(self.bn1(self.conv1(x_in)))
+        x1_dsc = self.conv1_dsc(x1)
+        x2 = F.relu(self.bn2(self.conv2(x1)))
+        x2_dsc = self.conv2_dsc(x2)
+        x3 = F.relu(self.bn3(self.conv3(x2)))
+        x3_dsc = self.conv3_dsc(x3)
+        x4 = self.res1(x3)
+        x5 = self.res2(x4)
+        x6 = self.res3(x5)
+        x7 = self.res4(x6)
+        x8 = self.res5(x7)
+        context_1 = torch.cat((x3_dsc, x8), 1)
+        context_2 = torch.cat((x2_dsc, x7), 1)
+        context_3 = torch.cat((x1_dsc, x6), 1)
+        x9 = F.relu(self.bn4(self.conv4(context_1)))
+        x10 = F.relu(self.bn5(self.conv5(context_2)))
+        x11 = self.conv6(context_3)
 
         if self.dropout:
-            pos_output = self.pos_output(self.dropout_pos(x))
-            cos_output = self.cos_output(self.dropout_cos(x))
-            sin_output = self.sin_output(self.dropout_sin(x))
-            width_output = self.width_output(self.dropout_wid(x))
+            pos_output = self.pos_output(self.dropout_pos(x11))
+            cos_output = self.cos_output(self.dropout_cos(x11))
+            sin_output = self.sin_output(self.dropout_sin(x11))
+            width_output = self.width_output(self.dropout_wid(x11))
         else:
-            pos_output = self.pos_output(x)
-            cos_output = self.cos_output(x)
-            sin_output = self.sin_output(x)
-            width_output = self.width_output(x)
+            pos_output = self.pos_output(x11)
+            cos_output = self.cos_output(x11)
+            sin_output = self.sin_output(x11)
+            width_output = self.width_output(x11)
 
         return pos_output, cos_output, sin_output, width_output
