@@ -10,28 +10,28 @@ class GenerativeResnet(GraspModel):
         super(GenerativeResnet, self).__init__()
         self.conv1 = nn.Conv2d(input_channels, channel_size, kernel_size=9, stride=1, padding=4)
         self.bn1 = nn.BatchNorm2d(channel_size)
-        self.conv1_dsc = DSC_Module(channel_size, channel_size);
+        self.conv1_dsc = DSC_Module(channel_size, channel_size)
         self.conv2 = nn.Conv2d(channel_size, channel_size * 2, kernel_size=4, stride=2, padding=1)
         self.bn2 = nn.BatchNorm2d(channel_size * 2)
-        self.conv2_dsc = DSC_Module(channel_size * 2, channel_size * 2);
+        self.conv2_dsc = DSC_Module(channel_size * 2, channel_size * 2)
         self.conv3 = nn.Conv2d(channel_size * 2, channel_size * 4, kernel_size=4, stride=2, padding=1)
         self.bn3 = nn.BatchNorm2d(channel_size * 4)
-        self.conv3_dsc = DSC_Module(channel_size * 4, channel_size * 4);
+        self.conv3_dsc = DSC_Module(channel_size * 4, channel_size * 4)
         self.res1 = ResidualBlock(channel_size * 4, channel_size * 4)
         self.res2 = ResidualBlock(channel_size * 4, channel_size * 4)
         self.res3 = ResidualBlock(channel_size * 4, channel_size * 4)
         self.res4 = ResidualBlock(channel_size * 4, channel_size * 4)
         self.res5 = ResidualBlock(channel_size * 4, channel_size * 4)
 
-        self.conv4 = nn.ConvTranspose2d(channel_size * 4, channel_size * 2, kernel_size=4, stride=2, padding=1,
+        self.conv4 = nn.ConvTranspose2d(channel_size * 8, channel_size * 4, kernel_size=4, stride=2, padding=1,
                                         output_padding=1)
         self.bn4 = nn.BatchNorm2d(channel_size * 2)
 
-        self.conv5 = nn.ConvTranspose2d(channel_size * 2, channel_size, kernel_size=4, stride=2, padding=2,
+        self.conv5 = nn.ConvTranspose2d(channel_size * 4, channel_size * 2, kernel_size=4, stride=2, padding=2,
                                         output_padding=1)
         self.bn5 = nn.BatchNorm2d(channel_size)
 
-        self.conv6 = nn.ConvTranspose2d(channel_size, channel_size, kernel_size=9, stride=1, padding=4)
+        self.conv6 = nn.ConvTranspose2d(channel_size * 2, channel_size, kernel_size=9, stride=1, padding=4)
 
         self.pos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
         self.cos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
