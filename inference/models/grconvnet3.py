@@ -29,7 +29,6 @@ class GenerativeResnet(GraspModel):
         self.conv5 = nn.ConvTranspose2d(channel_size * 4, channel_size, kernel_size=4, stride=2, padding=2,
                                         output_padding=2)
         self.bn5 = nn.BatchNorm2d(channel_size)
-
         self.conv6 = nn.ConvTranspose2d(channel_size, channel_size, kernel_size=9, stride=1, padding=4)
 
         self.pos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
