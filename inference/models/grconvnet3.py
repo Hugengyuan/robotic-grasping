@@ -21,14 +21,14 @@ class GenerativeResnet(GraspModel):
         self.res2 = ResidualBlock(channel_size * 4, channel_size * 4)
         self.res3 = ResidualBlock(channel_size * 4, channel_size * 4)
         self.res4 = ResidualBlock(channel_size * 4, channel_size * 4)
-        self.res5 = ResidualBlock(channel_size * 4, channel_size * 2)
+        self.res5 = ResidualBlock(channel_size * 4, channel_size * 4)
 
-        self.conv4 = nn.ConvTranspose2d(channel_size * 8, channel_size * 2, kernel_size=4, stride=2, padding=1)
+        self.conv4 = nn.ConvTranspose2d(channel_size * 8, channel_size * 4, kernel_size=4, stride=2, padding=1)
         self.bn4 = nn.BatchNorm2d(channel_size * 4)
 
-        self.conv5 = nn.ConvTranspose2d(channel_size * 2, channel_size, kernel_size=4, stride=2, padding=2,
+        self.conv5 = nn.ConvTranspose2d(channel_size * 4, channel_size, kernel_size=4, stride=2, padding=2,
                                         output_padding=2)
-        self.bn5 = nn.BatchNorm2d(channel_size * 2)
+        self.bn5 = nn.BatchNorm2d(channel_size)
 
         self.conv6 = nn.ConvTranspose2d(channel_size, channel_size, kernel_size=9, stride=1, padding=4)
 
@@ -62,7 +62,7 @@ class GenerativeResnet(GraspModel):
         # context_1 = torch.Size([2, 256, 56, 56])
         # x9 = torch.Size([2, 64, 112, 112])
         # context_2 = torch.Size([2, 128, 112, 112])
-        # x10 =
+        # x10 = torch.Size([2, 32, 112, 112])
         x1 = F.relu(self.bn1(self.conv1(x_in)))
         print(x1.size())
         x1_dsc = self.conv1_dsc(x1)
