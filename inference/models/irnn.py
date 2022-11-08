@@ -9,9 +9,9 @@ class Stream:
     ptr = torch.cuda.current_stream().cuda_stream
 
 
-IRNNForward = open('./inference/models/IRNN_Forward_cuda.cu', 'r').read()
+IRNNForward = open('/kaggle/working/GRConvnetDSC/robotic-grasping/inference/models/IRNN_Forward_cuda.cu', 'r').read()
 
-IRNNBackward = open('./inference/models/IRNN_Backward_cuda.cu', 'r').read()
+IRNNBackward = open('/kaggle/working/GRConvnetDSC/robotic-grasping/inference/models/IRNN_Backward_cuda.cu', 'r').read()
 
 
 # IRNNWeightBaisBackward = open('./IRNN_Weight_Bias_Backward_cuda.cu','r').read()
