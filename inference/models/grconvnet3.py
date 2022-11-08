@@ -50,6 +50,7 @@ class GenerativeResnet(GraspModel):
 
     def forward(self, x_in):
         x1 = F.relu(self.bn1(self.conv1(x_in)))
+
         x1_dsc = self.conv1_dsc(x1)
         x2 = F.relu(self.bn2(self.conv2(x1)))
         x2_dsc = self.conv2_dsc(x2)
@@ -62,6 +63,8 @@ class GenerativeResnet(GraspModel):
         x8 = self.res5(x7)
         context_1 = torch.cat((x3_dsc, x8), 1)
         x9 = F.relu(self.bn4(self.conv4(context_1)))
+        x9.size()
+        x2_dsc.size()
         context_2 = torch.cat((x2_dsc, x9), 1)
         x10 = F.relu(self.bn5(self.conv5(context_2)))
         context_3 = torch.cat((x1_dsc, x10), 1)
