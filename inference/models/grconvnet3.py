@@ -23,12 +23,16 @@ class GenerativeResnet(GraspModel):
         self.res4 = ResidualBlock(channel_size * 4, channel_size * 4)
         self.res5 = ResidualBlock(channel_size * 4, channel_size * 4)
 
-        self.conv4 = nn.ConvTranspose2d(channel_size * 8, channel_size * 2, kernel_size=4, stride=2, padding=1)
+        self.down1 = nn.Conv2d(channel_size * 8, channel_size * 4, kernel_size=3, stride=1, padding=1)
+        self.conv4 = nn.ConvTranspose2d(channel_size * 4, channel_size * 2, kernel_size=4, stride=2, padding=1)
         self.bn4 = nn.BatchNorm2d(channel_size * 2)
 
-        self.conv5 = nn.ConvTranspose2d(channel_size * 4, channel_size, kernel_size=4, stride=2, padding=1)
+        self.down2 = nn.Conv2d(channel_size * 4, channel_size * 2, kernel_size=3, stride=1, padding=1)
+        self.conv5 = nn.ConvTranspose2d(channel_size * 2, channel_size, kernel_size=4, stride=2, padding=1)
         self.bn5 = nn.BatchNorm2d(channel_size)
-        self.conv6 = nn.ConvTranspose2d(channel_size * 2, channel_size, kernel_size=10, stride=1, padding=4)
+
+        self.down3 = nn.Conv2d(channel_size * 4, channel_size, kernel_size=3, stride=1, padding=1)
+        self.conv6 = nn.ConvTranspose2d(channel_size, channel_size, kernel_size=10, stride=1, padding=4)
 
         self.pos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
         self.cos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
@@ -73,11 +77,14 @@ class GenerativeResnet(GraspModel):
         x7 = self.res4(x6)
         x8 = self.res5(x7)
         context_1 = torch.cat((x3_dsc, x8), 1)
-        x9 = F.relu(self.bn4(self.conv4(context_1)))
+        down_1 = self.down1(context_1)
+        x9 = F.relu(self.bn4(self.conv4(down_1)))
         context_2 = torch.cat((x2_dsc, x9), 1)
-        x10 = F.relu(self.bn5(self.conv5(context_2)))
+        down_2 = self.down2(context_2)
+        x10 = F.relu(self.bn5(self.conv5(down_2)))
         context_3 = torch.cat((x1_dsc, x10), 1)
-        x11 = self.conv6(context_3)
+        down_3 = self.down3(context_3)
+        x11 = self.conv6(down_3)
 
         if self.dropout:
             pos_output = self.pos_output(self.dropout_pos(x11))
