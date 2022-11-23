@@ -268,10 +268,12 @@ def run():
 #     train_indices, val_indices = indices[:split], indices[split:]
     
     kf = KFold(n_splits=5,shuffle=False)  # 初始化KFold
-    for train_index , test_index in kf.split(indices):  # 调用split方法切分数据
-        print('train_index:%s , test_index: %s ' %(train_index,test_index))
-    logging.info('Training size: {}'.format(len(train_indices)))
-    logging.info('Validation size: {}'.format(len(val_indices)))
+    for train_indices , val_indices in kf.split(indices):  # 调用split方法切分数据
+        logging.info('train_index:%s {}'.format(len(train_indices)))
+        logging.info('test_index:%s {}'.format(len(val_indices)))
+    
+    logging.info('Training size: {}'.format(len(train_indices[0])))
+    logging.info('Validation size: {}'.format(len(val_indices[0])))
 
     # Creating data samplers and loaders
     train_sampler = torch.utils.data.sampler.SubsetRandomSampler(train_indices)
