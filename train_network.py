@@ -12,7 +12,7 @@ import torch
 import torch.optim as optim
 import torch.utils.data
 from torchsummary import summary
-
+from sklearn.model_selection import KFold
 from hardware.device import get_device
 from inference.models import get_network
 from inference.post_process import post_process_output
@@ -261,11 +261,15 @@ def run():
 
     # Creating data indices for training and validation splits
     indices = list(range(dataset.length))
-    split = int(np.floor(args.split * dataset.length))
-    if args.ds_shuffle:
-        np.random.seed(args.random_seed)
-        np.random.shuffle(indices)
-    train_indices, val_indices = indices[:split], indices[split:]
+#     split = int(np.floor(args.split * dataset.length))
+#     if args.ds_shuffle:
+#         np.random.seed(args.random_seed)
+#         np.random.shuffle(indices)
+#     train_indices, val_indices = indices[:split], indices[split:]
+    
+    kf = KFold(n_splits=5,shuffle=False)  # 初始化KFold
+    for train_index , test_index in kf.split(indices):  # 调用split方法切分数据
+        print('train_index:%s , test_index: %s ' %(train_index,test_index))
     logging.info('Training size: {}'.format(len(train_indices)))
     logging.info('Validation size: {}'.format(len(val_indices)))
 
