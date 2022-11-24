@@ -282,8 +282,8 @@ def run():
 #     logging.info('Validation size: {}'.format(len(val_indices[0])))
 
     # Creating data samplers and loaders
-    train_sampler = torch.utils.data.sampler.SubsetRandomSampler(train_files[0])
-    val_sampler = torch.utils.data.sampler.SubsetRandomSampler(test_files[0])
+    train_sampler = torch.utils.data.sampler.SubsetRandomSampler(train_files[1])
+    val_sampler = torch.utils.data.sampler.SubsetRandomSampler(test_files[1])
 
     train_data = torch.utils.data.DataLoader(
         dataset,
