@@ -280,8 +280,8 @@ def run():
         train_files.append(np.array(indices)[Trindex].tolist())
         test_files.append(np.array(indices)[Tsindex].tolist())
 
-#     logging.info('Training size: {}'.format(len(train_indices[0])))
-#     logging.info('Validation size: {}'.format(len(val_indices[0])))
+#     logging.info('Training size: {}'.format(len(train_indices[1])))
+#     logging.info('Validation size: {}'.format(len(val_indices[1])))
 
     # Creating data samplers and loaders
     train_sampler = torch.utils.data.sampler.SubsetRandomSampler(train_files[0])
