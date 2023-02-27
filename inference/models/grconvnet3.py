@@ -17,11 +17,11 @@ class GenerativeResnet(GraspModel):
         self.conv3 = nn.Conv2d(channel_size * 2, channel_size * 4, kernel_size=4, stride=2, padding=1)
         self.bn3 = nn.BatchNorm2d(channel_size * 4)
 
-        self.res1 = ResidualBlock(channel_size * 4, channel_size * 4)
-        self.res2 = ResidualBlock(channel_size * 4, channel_size * 4)
-        self.res3 = ResidualBlock(channel_size * 4, channel_size * 4)
-        self.res4 = ResidualBlock(channel_size * 4, channel_size * 4)
-        self.res5 = ResidualBlock(channel_size * 4, channel_size * 4)
+        self.res1 = ResidualBlock(channel_size * 4, channel_size * 4, dilation=1)
+        self.res2 = ResidualBlock(channel_size * 4, channel_size * 4, dilation=2)
+        self.res3 = ResidualBlock(channel_size * 4, channel_size * 4, dilation=4)
+        self.res4 = ResidualBlock(channel_size * 4, channel_size * 4, dilation=8)
+        self.res5 = ResidualBlock(channel_size * 4, channel_size * 4, dilation=16)
 
         self.conv4 = nn.ConvTranspose2d(channel_size * 4, channel_size * 2, kernel_size=4, stride=2, padding=1,
                                         output_padding=1)
@@ -33,10 +33,10 @@ class GenerativeResnet(GraspModel):
 
         self.conv6 = nn.ConvTranspose2d(channel_size, channel_size, kernel_size=9, stride=1, padding=4)
 
-        self.pos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
-        self.cos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
-        self.sin_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
-        self.width_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
+        self.pos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=1)
+        self.cos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=1)
+        self.sin_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=1)
+        self.width_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=1)
 
         self.dropout = dropout
         self.dropout_pos = nn.Dropout(p=prob)
@@ -47,6 +47,7 @@ class GenerativeResnet(GraspModel):
         for m in self.modules():
             if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
                 nn.init.xavier_uniform_(m.weight, gain=1)
+
 
     def forward(self, x_in):
         x = F.relu(self.bn1(self.conv1(x_in)))
