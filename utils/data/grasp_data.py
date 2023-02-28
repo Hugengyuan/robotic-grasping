@@ -96,7 +96,7 @@ class GraspDatasetBase(torch.utils.data.Dataset):
         sin = self.numpy_to_torch(np.sin(2 * ang_img))
         width = self.numpy_to_torch(width_img)
 
-        return depth_x, rgb_x, (pos, cos, sin, width), idx, rot, zoom_factor
+        return rgb_x, depth_x, (pos, cos, sin, width), idx, rot, zoom_factor
 
     def __len__(self):
         return len(self.grasp_files)
