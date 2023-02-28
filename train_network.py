@@ -106,10 +106,11 @@ def validate(net, device, val_data, iou_threshold):
     ld = len(val_data)
 
     with torch.no_grad():
-        for x, y, didx, rot, zoom_factor in val_data:
-            xc = x.to(device)
+        for rgb_x, depth_x, y, didx, rot, zoom_factor in val_data:
+            rgb_xc = rgb_x.to(device)
+            depth_xc = depth_x.to(device)
             yc = [yy.to(device) for yy in y]
-            lossd = net.compute_loss(xc, yc)
+            lossd = net.compute_loss(rgb_xc, depth_xc, yc)
 
             loss = lossd['loss']
 
