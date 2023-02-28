@@ -47,10 +47,10 @@ class GenerativeResnet(GraspModel):
 
         self.up_conv3 = nn.ConvTranspose2d(channel_size * 4, channel_size, kernel_size=9, stride=1, padding=4)
         
-        self.pos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
-        self.cos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
-        self.sin_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
-        self.width_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
+        self.pos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, padding=1, kernel_size=2)
+        self.cos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, padding=1, kernel_size=2)
+        self.sin_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, padding=1, kernel_size=2)
+        self.width_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, padding=1, kernel_size=2)
 
         self.dropout = dropout
         self.dropout_pos = nn.Dropout(p=prob)
