@@ -169,7 +169,6 @@ def train(epoch, net, device, train_data, optimizer, batches_per_epoch, vis=Fals
                 break
 
             rgb_xc = rgb_x.to(device)
-            depth_x = depth_x.repeat_interleave(3,1)
             depth_xc = depth_x.to(device)
             yc = [yy.to(device) for yy in y]
             lossd = net.compute_loss(rgb_xc, depth_xc, yc)
