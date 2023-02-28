@@ -10,7 +10,7 @@ class GraspModel(nn.Module):
     def __init__(self):
         super(GraspModel, self).__init__()
 
-    def forward(self, x_in):
+    def forward(self, rgb_in, depth_in):
         raise NotImplementedError()
 
     def compute_loss(self, rgb_xc, depth_xc, yc):
@@ -38,8 +38,8 @@ class GraspModel(nn.Module):
             }
         }
 
-    def predict(self, xc):
-        pos_pred, cos_pred, sin_pred, width_pred = self(xc)
+    def predict(self, rgb_xc, depth_xc):
+        pos_pred, cos_pred, sin_pred, width_pred = self(rgb_xc, depth_xc)
         return {
             'pos': pos_pred,
             'cos': cos_pred,
