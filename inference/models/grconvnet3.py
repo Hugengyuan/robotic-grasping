@@ -11,7 +11,7 @@ class GenerativeResnet(GraspModel):
         self.conv1 = nn.Conv2d(input_channels, channel_size * 2, kernel_size=9, stride=1, padding=4)
         self.bn1 = nn.BatchNorm2d(channel_size * 2)
 
-        self.conv2 = nn.Conv2d(channel_size, channel_size * 4, kernel_size=4, stride=2, padding=1)
+        self.conv2 = nn.Conv2d(channel_size * 2, channel_size * 4, kernel_size=4, stride=2, padding=1)
         self.bn2 = nn.BatchNorm2d(channel_size * 4)
 
         self.conv3 = nn.Conv2d(channel_size * 4, channel_size * 8, kernel_size=4, stride=2, padding=1)
@@ -56,7 +56,7 @@ class GenerativeResnet(GraspModel):
         x = F.relu(self.bn1(self.conv1(x_in)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
-        x = F.relu(self.bn3(self.conv4(x)))
+        x = F.relu(self.bn4(self.conv4(x)))
         x = self.res1(x)
         x = self.res2(x)
         x = self.res3(x)
