@@ -6,33 +6,48 @@ from inference.models.grasp_model import GraspModel, ResidualBlock
 
 class GenerativeResnet(GraspModel):
 
-    def __init__(self, input_channels=4, output_channels=1, channel_size=32, dropout=False, prob=0.0):
+    def __init__(self, input_channels=3, output_channels=1, channel_size=32, dropout=False, prob=0.0):
         super(GenerativeResnet, self).__init__()
-        self.conv1 = nn.Conv2d(input_channels, channel_size, kernel_size=9, stride=1, padding=4)
-        self.bn1 = nn.BatchNorm2d(channel_size)
+        
+        self.rgb_conv1 = nn.Conv2d(input_channels, channel_size * 2, kernel_size=9, stride=1, padding=4)
+        self.rgb_bn1 = nn.BatchNorm2d(channel_size * 2)
 
-        self.conv2 = nn.Conv2d(channel_size, channel_size * 2, kernel_size=4, stride=2, padding=1)
-        self.bn2 = nn.BatchNorm2d(channel_size * 2)
+        self.rgb_conv2 = nn.Conv2d(channel_size * 2, channel_size * 4, kernel_size=4, stride=2, padding=1)
+        self.rgb_bn2 = nn.BatchNorm2d(channel_size * 4)
 
-        self.conv3 = nn.Conv2d(channel_size * 2, channel_size * 4, kernel_size=4, stride=2, padding=1)
-        self.bn3 = nn.BatchNorm2d(channel_size * 4)
+        self.rgb_conv3 = nn.Conv2d(channel_size * 4, channel_size * 8, kernel_size=4, stride=2, padding=1)
+        self.rgb_bn3 = nn.BatchNorm2d(channel_size * 8)
+        
+        self.depth_conv1 = nn.Conv2d(input_channels, channel_size * 2, kernel_size=9, stride=1, padding=4)
+        self.depth_bn1 = nn.BatchNorm2d(channel_size * 2)
 
-        self.res1 = ResidualBlock(channel_size * 4, channel_size * 4)
-        self.res2 = ResidualBlock(channel_size * 4, channel_size * 4)
-        self.res3 = ResidualBlock(channel_size * 4, channel_size * 4)
-        self.res4 = ResidualBlock(channel_size * 4, channel_size * 4)
-        self.res5 = ResidualBlock(channel_size * 4, channel_size * 4)
+        self.depth_conv2 = nn.Conv2d(channel_size * 2, channel_size * 4, kernel_size=4, stride=2, padding=1)
+        self.depth_bn2 = nn.BatchNorm2d(channel_size * 4)
 
-        self.conv4 = nn.ConvTranspose2d(channel_size * 4, channel_size * 2, kernel_size=4, stride=2, padding=1,
-                                        output_padding=1)
-        self.bn4 = nn.BatchNorm2d(channel_size * 2)
+        self.depth_conv3 = nn.Conv2d(channel_size * 4, channel_size * 8, kernel_size=4, stride=2, padding=1)
+        self.depth_bn3 = nn.BatchNorm2d(channel_size * 8)
+        
+        # 多层感知机的定义
+        # self.fc1 = nn.Linear(in_features=3*224*224, out_features=4096)
+        # self.fc2 = nn.Linear(in_features=4096, out_features=4096)
+        # self.fc3 = nn.Linear(in_features=4096, out_features=1024)
+        
 
-        self.conv5 = nn.ConvTranspose2d(channel_size * 2, channel_size, kernel_size=4, stride=2, padding=2,
-                                        output_padding=1)
-        self.bn5 = nn.BatchNorm2d(channel_size)
+        self.res1 = ResidualBlock(channel_size * 16, channel_size * 16)
+        self.res2 = ResidualBlock(channel_size * 16, channel_size * 16)
+        self.res3 = ResidualBlock(channel_size * 16, channel_size * 16)
 
-        self.conv6 = nn.ConvTranspose2d(channel_size, channel_size, kernel_size=9, stride=1, padding=4)
+        self.up_conv1 = nn.ConvTranspose2d(channel_size * 16, channel_size * 8, kernel_size=4, stride=2, padding=1)
+        self.up_bn1 = nn.BatchNorm2d(channel_size * 8)
+        
+        self.up_conv2 = nn.ConvTranspose2d(channel_size * 8, channel_size * 4, kernel_size=4, stride=2, padding=1)
+        self.up_bn2 = nn.BatchNorm2d(channel_size * 4)
 
+        self.up_conv3 = nn.ConvTranspose2d(channel_size * 4, channel_size * 2, kernel_size=4, stride=2, padding=1)
+        self.up_bn3 = nn.BatchNorm2d(channel_size * 2)
+
+        self.up_conv4 = nn.ConvTranspose2d(channel_size * 2, channel_size, kernel_size=9, stride=1, padding=4)
+        
         self.pos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
         self.cos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
         self.sin_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
@@ -48,18 +63,23 @@ class GenerativeResnet(GraspModel):
             if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
                 nn.init.xavier_uniform_(m.weight, gain=1)
 
-    def forward(self, x_in):
-        x = F.relu(self.bn1(self.conv1(x_in)))
-        x = F.relu(self.bn2(self.conv2(x)))
-        x = F.relu(self.bn3(self.conv3(x)))
+    def forward(self, rgb_in, depth_in):
+        rgb_x = F.relu(self.rgb_bn1(self.rgb_conv1(rgb_in)))
+        rgb_x = F.relu(self.rgb_bn2(self.rgb_conv2(rgb_x)))
+        rgb_x = F.relu(self.rgb_bn3(self.rgb_conv3(rgb_x)))
+        depth_x = depth_in.repeat_interleave(3,1)
+        depth_x = F.relu(self.depth_bn1(self.depth_conv1(depth_x)))
+        depth_x = F.relu(self.depth_bn2(self.depth_conv2(depth_x)))
+        depth_x = F.relu(self.depth_bn3(self.depth_conv3(depth_x)))
+        x = torch.cat([rgb_x, depth_x], 1)
         x = self.res1(x)
         x = self.res2(x)
         x = self.res3(x)
-        x = self.res4(x)
-        x = self.res5(x)
-        x = F.relu(self.bn4(self.conv4(x)))
-        x = F.relu(self.bn5(self.conv5(x)))
-        x = self.conv6(x)
+       
+        x = F.relu(self.up_bn1(self.up_conv1(x)))
+        x = F.relu(self.up_bn2(self.up_conv2(x)))
+        x = F.relu(self.up_bn3(self.up_conv3(x)))
+        x = self.up_conv4(x)
 
         if self.dropout:
             pos_output = self.pos_output(self.dropout_pos(x))
