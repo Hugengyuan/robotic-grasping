@@ -25,39 +25,39 @@ from utils.visualisation.gridshow import gridshow
 def parse_args():
     parser = argparse.ArgumentParser(description='Train network')
 
-    # Network
+    # 网络相关参数
     parser.add_argument('--network', type=str, default='grconvnet3',
-                        help='Network name in inference/models')
+                        help='设定使用的骨干网络，包括grconvnet到grconvnet4')
     parser.add_argument('--input-size', type=int, default=224,
-                        help='Input image size for the network')
+                        help='网络第一层的输入大小，默认为224')
     parser.add_argument('--use-depth', type=int, default=1,
-                        help='Use Depth image for training (1/0)')
+                        help='是否使用深度图像')
     parser.add_argument('--use-rgb', type=int, default=1,
-                        help='Use RGB image for training (1/0)')
+                        help='是否使用RGB图像')
     parser.add_argument('--use-dropout', type=int, default=1,
-                        help='Use dropout for training (1/0)')
+                        help='是否使用Dropout')
     parser.add_argument('--dropout-prob', type=float, default=0.1,
-                        help='Dropout prob for training (0-1)')
+                        help='设定dropout的概率，默认为10%')
     parser.add_argument('--channel-size', type=int, default=32,
-                        help='Internal channel size for the network')
+                        help='输入的通道数，默认为32')
     parser.add_argument('--iou-threshold', type=float, default=0.25,
-                        help='Threshold for IOU matching')
+                        help='判断为正确抓取的IOU的阈值，默认为25%重合就算做成功抓取')
 
-    # Datasets
+    # 数据集相关参数
     parser.add_argument('--dataset', type=str,
-                        help='Dataset Name ("cornell" or "jaquard")')
+                        help='设定使用的数据集 ("cornell" 或 "jaquard")')
     parser.add_argument('--dataset-path', type=str,
-                        help='Path to dataset')
+                        help='数据集的路径')
     parser.add_argument('--split', type=float, default=0.9,
-                        help='Fraction of data for training (remainder is validation)')
+                        help='设定用于训练的百分比，剩余的用于validation')
     parser.add_argument('--ds-shuffle', action='store_true', default=False,
-                        help='Shuffle the dataset')
+                        help='是否开启shuffle')
     parser.add_argument('--ds-rotate', type=float, default=0.0,
-                        help='Shift the start point of the dataset to use a different test/train split')
+                        help='改变数据集的分割点，从而使得分割出来的测试集和训练集不同')
     parser.add_argument('--num-workers', type=int, default=8,
                         help='Dataset workers')
 
-    # Training
+    # 训练的相关参数
     parser.add_argument('--batch-size', type=int, default=8,
                         help='Batch size')
     parser.add_argument('--epochs', type=int, default=50,
@@ -65,19 +65,19 @@ def parse_args():
     parser.add_argument('--batches-per-epoch', type=int, default=1000,
                         help='Batches per Epoch')
     parser.add_argument('--optim', type=str, default='adam',
-                        help='Optmizer for the training. (adam or SGD)')
+                        help='优化器. (adam or SGD)')
 
-    # Logging etc.
+    # 其他参数
     parser.add_argument('--description', type=str, default='',
                         help='Training description')
     parser.add_argument('--logdir', type=str, default='logs/',
-                        help='Log directory')
+                        help='Log的保存位置')
     parser.add_argument('--vis', action='store_true',
-                        help='Visualise the training process')
+                        help='是否开启训练过程的可视化')
     parser.add_argument('--cpu', dest='force_cpu', action='store_true', default=False,
-                        help='Force code to run in CPU mode')
+                        help='强制使用cpu训练，默认为False')
     parser.add_argument('--random-seed', type=int, default=123,
-                        help='Random seed for numpy')
+                        help='随机种子')
 
     args = parser.parse_args()
     return args
@@ -209,7 +209,7 @@ def train(epoch, net, device, train_data, optimizer, batches_per_epoch, vis=Fals
 def run():
     args = parse_args()
 
-    # Set-up output directories
+    # 设置输出的log位置以及相关的参数
     dt = datetime.datetime.now().strftime('%y%m%d_%H%M')
     net_desc = '{}_{}'.format(dt, '_'.join(args.description.split()))
 
@@ -218,13 +218,13 @@ def run():
         os.makedirs(save_folder)
     tb = tensorboardX.SummaryWriter(save_folder)
     
-    # Save commandline args
+    # 存储命令行的参数
     if args is not None:
         params_path = os.path.join(save_folder, 'commandline_args.json')
         with open(params_path, 'w') as f:
             json.dump(vars(args), f)
 
-    # Initialize logging
+    # 初始化logging
     logging.root.handlers = []
     logging.basicConfig(
         level=logging.INFO,
@@ -232,23 +232,22 @@ def run():
         format='[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s',
         datefmt='%H:%M:%S'
     )
-    # set up logging to console
+    # 将logging的句柄绑定到console
     console = logging.StreamHandler()
     console.setLevel(logging.DEBUG)
-    # set a format which is simpler for console use
+    # 设置logging的格式以遍展示在console上
     formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
     console.setFormatter(formatter)
-    # add the handler to the root logger
     logging.getLogger('').addHandler(console)
 
-    # Get the compute device
+    # 获取设备
     device = get_device(args.force_cpu)
 
     
     logging.info('Log files were saved to dir {}'.format(save_folder))
     
     
-    # Load Dataset
+    # 载入数据集
     logging.info('Loading {} Dataset...'.format(args.dataset.title()))
     Dataset = get_dataset(args.dataset)
     dataset = Dataset(args.dataset_path,
@@ -304,7 +303,7 @@ def run():
     )
     logging.info('Done')
 
-    # Load the network
+    # 载入网络
     logging.info('Loading Network...')
     input_channels = 1 * args.use_depth + 3 * args.use_rgb
     network = get_network(args.network)
@@ -325,37 +324,39 @@ def run():
     else:
         raise NotImplementedError('Optimizer {} is not implemented'.format(args.optim))
 
-    # Print model architecture.
+    # 打印网络结构
     summary(net, (input_channels, args.input_size, args.input_size))
     f = open(os.path.join(save_folder, 'arch.txt'), 'w')
     sys.stdout = f
     summary(net, (input_channels, args.input_size, args.input_size))
     sys.stdout = sys.__stdout__
     f.close()
-
+    
+    # 使用best_iou保存
     best_iou = 0.0
     for epoch in range(args.epochs):
+        # 训练一个epoch
         logging.info('Beginning Epoch {:02d}'.format(epoch))
         train_results = train(epoch, net, device, train_data, optimizer, args.batches_per_epoch, vis=args.vis)
 
-        # Log training losses to tensorboard
+        # 训练一个epoch后将loss添加到tensorboard中
         tb.add_scalar('loss/train_loss', train_results['loss'], epoch)
         for n, l in train_results['losses'].items():
             tb.add_scalar('train_loss/' + n, l, epoch)
 
-        # Run Validation
+        # 开始验证
         logging.info('Validating...')
         test_results = validate(net, device, val_data, args.iou_threshold)
         logging.info('%d/%d = %f' % (test_results['correct'], test_results['correct'] + test_results['failed'],
                                      test_results['correct'] / (test_results['correct'] + test_results['failed'])))
 
-        # Log validation results to tensorbaord
+        # 将验证的loss添加到tensorboard中
         tb.add_scalar('loss/IOU', test_results['correct'] / (test_results['correct'] + test_results['failed']), epoch)
         tb.add_scalar('loss/val_loss', test_results['loss'], epoch)
         for n, l in test_results['losses'].items():
             tb.add_scalar('val_loss/' + n, l, epoch)
 
-        # Save best performing network
+        # 每10轮保存最好的iou的模型
         iou = test_results['correct'] / (test_results['correct'] + test_results['failed'])
         if iou > best_iou or epoch == 0 or (epoch % 10) == 0:
             torch.save(net, os.path.join(save_folder, 'epoch_%02d_iou_%0.2f' % (epoch, iou)))
