@@ -172,7 +172,7 @@ def train(epoch, net, device, train_data, optimizer, batches_per_epoch, vis=Fals
             depth_x = depth_x.repeat_interleave(3,1)
             depth_xc = depth_x.to(device)
             yc = [yy.to(device) for yy in y]
-            lossd = net.compute_loss(rgb_xc, depth_x, yc)
+            lossd = net.compute_loss(rgb_xc, depth_xc, yc)
 
             loss = lossd['loss']
 
