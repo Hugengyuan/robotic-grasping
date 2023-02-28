@@ -13,9 +13,9 @@ class GraspModel(nn.Module):
     def forward(self, x_in):
         raise NotImplementedError()
 
-    def compute_loss(self, xc, yc):
+    def compute_loss(self, rgb_xc, depth_xc, yc):
         y_pos, y_cos, y_sin, y_width = yc
-        pos_pred, cos_pred, sin_pred, width_pred = self(xc)
+        pos_pred, cos_pred, sin_pred, width_pred = self(rgb_xc, depth_xc)
 
         p_loss = F.smooth_l1_loss(pos_pred, y_pos)
         cos_loss = F.smooth_l1_loss(cos_pred, y_cos)
