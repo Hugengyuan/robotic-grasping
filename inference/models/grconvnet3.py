@@ -68,9 +68,11 @@ class GenerativeResnet(GraspModel):
         rgb_x = F.relu(self.rgb_bn1(self.rgb_conv1(rgb_in)))
         rgb_x = F.relu(self.rgb_bn2(self.rgb_conv2(rgb_x)))
         rgb_x = F.relu(self.rgb_bn3(self.rgb_conv3(rgb_x)))
-        depth_x = F.relu(self.depth_bn1(self.depth_conv1(depth_in)))
+        depth_x = depth_in.repeat_interleave(3,0)
+        depth_x = F.relu(self.depth_bn1(self.depth_conv1(depth_x)))
         depth_x = F.relu(self.depth_bn2(self.depth_conv2(depth_x)))
         depth_x = F.relu(self.depth_bn3(self.depth_conv3(depth_x)))
+        
         x = torch.cat([rgb_x, depth_x], 1)
         x = self.res1(x)
         x = self.res2(x)
