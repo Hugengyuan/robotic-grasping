@@ -89,7 +89,8 @@ class GraspDatasetBase(torch.utils.data.Dataset):
         if self.include_depth:
             depth_x = self.numpy_to_torch(np.expand_dims(depth_img, 0))
         if self.include_rgb:
-            rgb_x = self.numpy_to_torch(rgb_img)
+#             rgb_x = self.numpy_to_torch(rgb_img)
+            rgb_x = torch.from_numpy(rgb_img)
 
         pos = self.numpy_to_torch(pos_img)
         cos = self.numpy_to_torch(np.cos(2 * ang_img))
