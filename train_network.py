@@ -161,14 +161,15 @@ def train(epoch, net, device, train_data, optimizer, batches_per_epoch, vis=Fals
     batch_idx = 0
     # Use batches per epoch to make training on different sized datasets (cornell/jacquard) more equivalent.
     while batch_idx <= batches_per_epoch:
-        for x, y, _, _, _ in train_data:
+        for rgb_x, depth_x, y, _, _, _ in train_data:
             batch_idx += 1
             if batch_idx >= batches_per_epoch:
                 break
 
-            xc = x.to(device)
+            rgb_xc = rgb_x.to(device)
+            depth_xc = depth_x.to(device)
             yc = [yy.to(device) for yy in y]
-            lossd = net.compute_loss(xc, yc)
+            lossd = net.compute_loss(rgb_xc, depth_x, yc)
 
             loss = lossd['loss']
 
