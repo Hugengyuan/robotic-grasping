@@ -52,8 +52,10 @@ class GenerativeResnet(GraspModel):
         self.up_conv2 = nn.ConvTranspose2d(channel_size * 8, channel_size * 4, kernel_size=4, stride=2, padding=1)
         self.up_bn2 = nn.BatchNorm2d(channel_size * 4)
 
+        self.up_conv3 = nn.ConvTranspose2d(channel_size * 4, channel_size * 2, kernel_size=4, stride=2, padding=1)
+        self.up_bn3 = nn.BatchNorm2d(channel_size * 2)
 
-        self.up_conv3 = nn.ConvTranspose2d(channel_size * 4, channel_size, kernel_size=9, stride=1, padding=4)
+        self.up_conv4 = nn.ConvTranspose2d(channel_size * 2, channel_size, kernel_size=9, stride=1, padding=4)
         
         self.pos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=3, padding=1)
         self.cos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=3, padding=1)
@@ -91,7 +93,8 @@ class GenerativeResnet(GraspModel):
        
         x = F.relu(self.up_bn1(self.up_conv1(x)))
         x = F.relu(self.up_bn2(self.up_conv2(x)))
-        x = self.up_conv3(x)
+        x = F.relu(self.up_bn3(self.up_conv3(x)))
+        x = self.up_conv4(x)
 
         if self.dropout:
             pos_output = self.pos_output(self.dropout_pos(x))
