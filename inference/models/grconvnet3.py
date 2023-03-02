@@ -34,6 +34,15 @@ class GenerativeResnet(GraspModel):
         self.depth_conv4 = nn.Conv2d(channel_size * 8, channel_size * 16, kernel_size=4, stride=2, padding=1)
         self.depth_bn4 = nn.BatchNorm2d(channel_size * 16)
         
+        
+        self.global_conv1 = nn.Conv2d(channel_size * 16, channel_size * 8, kernel_size=3, padding=1)
+        self.global_bn1 = nn.BatchNorm2d(channel_size * 8)
+        self.global_conv2 = nn.Conv2d(channel_size * 8, channel_size * 4, kernel_size=3, padding=1)
+        self.global_bn2 = nn.BatchNorm2d(channel_size * 4)
+        self.global_conv3 = nn.Conv2d(channel_size * 4, channel_size * 2, kernel_size=3, padding=1)
+        self.global_bn3 = nn.BatchNorm2d(channel_size * 2)
+        self.global_conv4 = nn.Conv2d(channel_size * 2, channel_size, kernel_size=3, padding=1)
+        self.global_bn4 = nn.BatchNorm2d(channel_size)
         # 多层感知机的定义
         # self.fc1 = nn.Linear(in_features=3*224*224, out_features=4096)
         # self.fc2 = nn.Linear(in_features=4096, out_features=4096)
@@ -84,7 +93,15 @@ class GenerativeResnet(GraspModel):
         depth_x = F.relu(self.depth_bn4(self.depth_conv4(depth_x)))
         
         #x = torch.cat([rgb_x, depth_x], 1)
-        x = rgb_x + depth_x
+        temp = rgb_x + depth_x
+        
+        x = F.relu(self.global_bn1(self.global_conv1(temp)))
+        x = F.relu(self.global_bn2(self.global_conv2(x)))
+        x = F.relu(self.global_bn3(self.global_conv3(x)))
+        x = F.relu(self.global_bn4(self.global_conv4(x)))
+        x = torch.mean(input_tensor, dim=-1)
+        x = temp * x[..., None]
+        
         x = self.res1(x)
         x = self.res2(x)
         x = self.res3(x)
