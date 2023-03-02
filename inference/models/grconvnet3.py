@@ -99,7 +99,8 @@ class GenerativeResnet(GraspModel):
         x = F.relu(self.global_bn2(self.global_conv2(x)))
         x = F.relu(self.global_bn3(self.global_conv3(x)))
         x = F.relu(self.global_bn4(self.global_conv4(x)))
-        x = torch.mean(x, dim=1)
+        x = torch.mean(x, dim=0)
+        print(x.shape)
         x = temp * x[..., None]
         
         x = self.res1(x)
