@@ -76,13 +76,13 @@ if __name__ == '__main__':
     img_data = CameraData(include_depth=args.use_depth, include_rgb=args.use_rgb)
 
     x, depth_img, rgb_img = img_data.get_data(rgb=rgb, depth=depth)
-    start_time = time.time()
+    
     with torch.no_grad():
         xc = x.to(device)
         pred = net.predict(xc)
         
         logging.info('pred')
-        
+        start_time = time.time()
         q_img, ang_img, width_img = post_process_output(pred['pos'], pred['cos'], pred['sin'], pred['width'])
         end_time = time.time()
         if args.jacquard_output:
