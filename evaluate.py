@@ -11,7 +11,7 @@ import torch.utils.data
 from hardware.device import get_device
 from inference.post_process import post_process_output
 from utils.data import get_dataset
-from utils.data.camera_data import CameraData
+
 from utils.dataset_processing import evaluation, grasp
 from utils.visualisation.plot import save_results, plot_results
 
@@ -133,7 +133,6 @@ if __name__ == '__main__':
             with open(jo_fn, 'w') as f:
                 pass
             
-        img_data = CameraData(include_depth=args.use_depth, include_rgb=args.use_rgb)
         start_time = time.time()
 
         with torch.no_grad():
@@ -164,7 +163,7 @@ if __name__ == '__main__':
                         logging.info('save')
                         fig = plt.figure(figsize=(10, 10))
                         plot_results(fig=fig,
-                                     rgb_img=img_data.get_rgb(rgb, False),
+                                     rgb_img=test_data.dataset.get_rgb(didx, rot, zoom, normalise=False),
                                      grasp_q_img=q_img,
                                      grasp_angle_img=ang_img,
                                      no_grasps=args.n_grasps,
