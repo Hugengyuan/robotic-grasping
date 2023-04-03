@@ -152,6 +152,17 @@ if __name__ == '__main__':
                         results['correct'] += 1
                     else:
                         results['failed'] += 1
+                        logging.info('save')
+                        fig = plt.figure(figsize=(10, 10))
+                        plot_results(fig=fig,
+                                     rgb_img=img_data.get_rgb(rgb, False),
+                                     grasp_q_img=q_img,
+                                     grasp_angle_img=ang_img,
+                                     no_grasps=args.n_grasps,
+                                     grasp_width_img=width_img)
+                        fig.show()
+                        fig.savefig('img{}.pdf'.format(didx))
+                        logging.info('save done')
 
                 if args.jacquard_output:
                     grasps = grasp.detect_grasps(q_img, ang_img, width_img=width_img, no_grasps=1)
