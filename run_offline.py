@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     with torch.no_grad():
         xc = x.to(device)
-        pred = net.predict(xc.as_contiguous())
+        pred = net.predict(xc.contiguous())
 
         q_img, ang_img, width_img = post_process_output(pred['pos'], pred['cos'], pred['sin'], pred['width'])
 
