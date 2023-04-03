@@ -28,9 +28,9 @@ class Spacial_IRNN(nn.Module):
         self.down_weight.weight = nn.Parameter(torch.tensor([[[[alpha]]]] * in_channels))
 
     def forward(self, input):
-        return irnn.apply(input, self.up_weight.weight, self.right_weight.weight, self.down_weight.weight,
-                          self.left_weight.weight, self.up_weight.bias, self.right_weight.bias, self.down_weight.bias,
-                          self.left_weight.bias)
+        return irnn.apply(input.contiguous(), self.up_weight.weight.contiguous(), self.right_weight.weight.contiguous(), self.down_weight.weight.contiguous(),
+                          self.left_weight.weight.contiguous(), self.up_weight.bias.contiguous(), self.right_weight.bias.contiguous(), self.down_weight.bias.contiguous(),
+                          self.left_weight.bias.contiguous())
 
 
 class Attention(nn.Module):
