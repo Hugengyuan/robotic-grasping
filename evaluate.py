@@ -11,6 +11,7 @@ import torch.utils.data
 from hardware.device import get_device
 from inference.post_process import post_process_output
 from utils.data import get_dataset
+from utils.data.camera_data import CameraData
 from utils.dataset_processing import evaluation, grasp
 from utils.visualisation.plot import save_results, plot_results
 
