@@ -39,7 +39,19 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-
+    logging.root.handlers = []
+    logging.basicConfig(
+        level=logging.INFO,
+        
+    )
+    # set up logging to console
+    console = logging.StreamHandler()
+    console.setLevel(logging.DEBUG)
+    # set a format which is simpler for console use
+    formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+    console.setFormatter(formatter)
+    # add the handler to the root logger
+    logging.getLogger('').addHandler(console)
     # Load image
     logging.info('Loading image...')
     pic = Image.open(args.rgb_path, 'r')
