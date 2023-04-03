@@ -31,31 +31,23 @@ class irnn(torch.autograd.Function):
     @staticmethod
     def forward(self, input_feature, weight_up, weight_right, weight_down, weight_left, bias_up, bias_right, bias_down,
                 bias_left):
-#         input_feature.contiguous()
-#         weight_left.contiguous()
-#         weight_right.contiguous()
-#         weight_down.contiguous()
-#         assert (input_feature.is_contiguous() == True)
-#         assert (weight_left.is_contiguous() == True)
-#         assert (weight_right.is_contiguous() == True)
-#         assert (weight_down.is_contiguous() == True)
+       
+        assert (input_feature.is_contiguous() == True)
+        assert (weight_left.is_contiguous() == True)
+        assert (weight_right.is_contiguous() == True)
+        assert (weight_down.is_contiguous() == True)
 
-#         weight_up.contiguous()
-#         bias_left.contiguous()
-#         bias_right.contiguous()
-#         bias_up.contiguous()
-#         bias_down.contiguous()
         
-#         assert (weight_up.is_contiguous() == True)
-#         assert (bias_left.is_contiguous() == True)
-#         assert (bias_right.is_contiguous() == True)
-#         assert (bias_up.is_contiguous() == True)
-#         assert (bias_down.is_contiguous() == True)
+        assert (weight_up.is_contiguous() == True)
+        assert (bias_left.is_contiguous() == True)
+        assert (bias_right.is_contiguous() == True)
+        assert (bias_up.is_contiguous() == True)
+        assert (bias_down.is_contiguous() == True)
 
-        output_left = input_feature.contiguous().clone()
-        output_right = input_feature.contiguous().clone()
-        output_up = input_feature.contiguous().clone()
-        output_down = input_feature.contiguous().clone()
+        output_left = input_feature.clone()
+        output_right = input_feature.clone()
+        output_up = input_feature.clone()
+        output_down = input_feature.clone()
 
         if input_feature.is_cuda == True:
             n = input_feature.nelement()
@@ -66,24 +58,24 @@ class irnn(torch.autograd.Function):
                 args=[
                     input_feature.data_ptr(),
 
-                    weight_up.contiguous().data_ptr(),
-                    weight_right.contiguous().data_ptr(),
-                    weight_down.contiguous().data_ptr(),
-                    weight_left.contiguous().data_ptr(),
+                    weight_up.data_ptr(),
+                    weight_right.data_ptr(),
+                    weight_down.data_ptr(),
+                    weight_left.data_ptr(),
 
-                    bias_up.contiguous().data_ptr(),
-                    bias_right.contiguous().data_ptr(),
-                    bias_down.contiguous().data_ptr(),
-                    bias_left.contiguous().data_ptr(),
+                    bias_up.data_ptr(),
+                    bias_right.data_ptr(),
+                    bias_down.data_ptr(),
+                    bias_left.data_ptr(),
 
-                    output_up.contiguous().data_ptr(),
-                    output_right.contiguous().data_ptr(),
-                    output_down.contiguous().data_ptr(),
-                    output_left.contiguous().data_ptr(),
+                    output_up.data_ptr(),
+                    output_right.data_ptr(),
+                    output_down.data_ptr(),
+                    output_left.data_ptr(),
 
-                    input_feature.contiguous().size(1),
-                    input_feature.contiguous().size(2),
-                    input_feature.contiguous().size(3),
+                    input_feature.size(1),
+                    input_feature.size(2),
+                    input_feature.size(3),
                     n],
                 stream=Stream
             )
