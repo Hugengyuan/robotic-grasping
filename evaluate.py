@@ -132,11 +132,18 @@ if __name__ == '__main__':
             jo_fn = network + '_jacquard_output.txt'
             with open(jo_fn, 'w') as f:
                 pass
+            
         img_data = CameraData(include_depth=args.use_depth, include_rgb=args.use_rgb)
         start_time = time.time()
 
         with torch.no_grad():
             for idx, (x, y, didx, rot, zoom) in enumerate(test_data):
+                print(idx)
+                print(x)
+                print(y)
+                print(didx)
+                print(rot)
+                print(zoom)
                 xc = x.to(device)
                 yc = [yi.to(device) for yi in y]
                 lossd = net.compute_loss(xc, yc)
