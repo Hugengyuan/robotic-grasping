@@ -74,10 +74,13 @@ if __name__ == '__main__':
     with torch.no_grad():
         xc = x.to(device)
         pred = net.predict(xc)
-
+        
+        logging.info('pred')
+        
         q_img, ang_img, width_img = post_process_output(pred['pos'], pred['cos'], pred['sin'], pred['width'])
-
+        logging.info('q_img')
         if args.save:
+            logging.info('save')
             save_results(
                 rgb_img=img_data.get_rgb(rgb, False),
                 depth_img=np.squeeze(img_data.get_depth(depth)),
@@ -86,6 +89,7 @@ if __name__ == '__main__':
                 no_grasps=args.n_grasps,
                 grasp_width_img=width_img
             )
+            logging.info('save done')
         else:
             fig = plt.figure(figsize=(10, 10))
             plot_results(fig=fig,
