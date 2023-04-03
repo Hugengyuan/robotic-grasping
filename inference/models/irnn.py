@@ -31,17 +31,26 @@ class irnn(torch.autograd.Function):
     @staticmethod
     def forward(self, input_feature, weight_up, weight_right, weight_down, weight_left, bias_up, bias_right, bias_down,
                 bias_left):
-        
-#         assert (input_feature.is_contiguous() == True)
-#         assert (weight_left.is_contiguous() == True)
-#         assert (weight_right.is_contiguous() == True)
-#         assert (weight_down.is_contiguous() == True)
+        input_feature.contiguous()
+        weight_left.contiguous()
+        weight_right.contiguous()
+        weight_down.contiguous()
+        assert (input_feature.is_contiguous() == True)
+        assert (weight_left.is_contiguous() == True)
+        assert (weight_right.is_contiguous() == True)
+        assert (weight_down.is_contiguous() == True)
 
-#         assert (weight_up.is_contiguous() == True)
-#         assert (bias_left.is_contiguous() == True)
-#         assert (bias_right.is_contiguous() == True)
-#         assert (bias_up.is_contiguous() == True)
-#         assert (bias_down.is_contiguous() == True)
+        weight_up.contiguous()
+        bias_left.contiguous()
+        bias_right.contiguous()
+        bias_up.contiguous()
+        bias_down.contiguous()
+        
+        assert (weight_up.is_contiguous() == True)
+        assert (bias_left.is_contiguous() == True)
+        assert (bias_right.is_contiguous() == True)
+        assert (bias_up.is_contiguous() == True)
+        assert (bias_down.is_contiguous() == True)
 
         output_left = input_feature.clone()
         output_right = input_feature.clone()
