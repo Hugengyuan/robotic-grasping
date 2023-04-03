@@ -131,7 +131,7 @@ if __name__ == '__main__':
             jo_fn = network + '_jacquard_output.txt'
             with open(jo_fn, 'w') as f:
                 pass
-
+        img_data = CameraData(include_depth=args.use_depth, include_rgb=args.use_rgb)
         start_time = time.time()
 
         with torch.no_grad():
