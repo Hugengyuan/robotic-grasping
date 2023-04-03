@@ -31,7 +31,7 @@ class irnn(torch.autograd.Function):
     @staticmethod
     def forward(self, input_feature, weight_up, weight_right, weight_down, weight_left, bias_up, bias_right, bias_down,
                 bias_left):
-
+        input_feature.as_contiguous()
         assert (input_feature.is_contiguous() == True)
         assert (weight_left.is_contiguous() == True)
         assert (weight_right.is_contiguous() == True)
