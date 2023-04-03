@@ -9,6 +9,7 @@ from PIL import Image
 from hardware.device import get_device
 from inference.post_process import post_process_output
 from utils.data.camera_data import CameraData
+from utils.dataset_processing import evaluation, grasp
 from utils.visualisation.plot import plot_results, save_results
 
 logging.basicConfig(level=logging.INFO)
@@ -70,7 +71,7 @@ if __name__ == '__main__':
     img_data = CameraData(include_depth=args.use_depth, include_rgb=args.use_rgb)
 
     x, depth_img, rgb_img = img_data.get_data(rgb=rgb, depth=depth)
-
+    start_time = time.time()
     with torch.no_grad():
         xc = x.to(device)
         pred = net.predict(xc)
@@ -78,7 +79,16 @@ if __name__ == '__main__':
         logging.info('pred')
         
         q_img, ang_img, width_img = post_process_output(pred['pos'], pred['cos'], pred['sin'], pred['width'])
-        logging.info('q_img')
+        end_time = time.time()
+        if args.jacquard_output:
+            grasps = grasp.detect_grasps(q_img, ang_img, width_img=width_img, no_grasps=1)
+            with open(jo_fn, 'a') as f:
+                for g in grasps:
+#                   f.write(test_data.dataset.get_jname(didx) + '\n')
+                    f.write(g.to_jacquard(scale=1024 / 300) + '\n')
+                            
+        logging.info('time per image: {}ms'.format((end_time - start_time) * 1000))
+        
         if args.save:
 
             save_results(
