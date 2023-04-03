@@ -33,7 +33,8 @@ def parse_args():
                         help='Save the results')
     parser.add_argument('--cpu', dest='force_cpu', action='store_true', default=False,
                         help='Force code to run in CPU mode')
-
+    parser.add_argument('--jacquard-output', action='store_true',
+                        help='Jacquard-dataset style output')
     args = parser.parse_args()
     return args
 
