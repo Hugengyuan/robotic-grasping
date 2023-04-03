@@ -65,11 +65,11 @@ if __name__ == '__main__':
     logging.info('Loading model...')
     net = torch.load(args.network)
     logging.info('Done')
-    for network in args.network:
-        if args.jacquard_output:
-            jo_fn = network + '_jacquard_output.txt'
-            with open(jo_fn, 'w') as f:
-                pass
+
+    if args.jacquard_output:
+        jo_fn = network + 'jacquard_output.txt'
+        with open(jo_fn, 'w') as f:
+            pass
     # Get the compute device
     device = get_device(args.force_cpu)
 
