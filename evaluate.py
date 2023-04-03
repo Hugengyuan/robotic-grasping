@@ -12,7 +12,7 @@ from hardware.device import get_device
 from inference.post_process import post_process_output
 from utils.data import get_dataset
 from utils.dataset_processing import evaluation, grasp
-from utils.visualisation.plot import save_results
+from utils.visualisation.plot import save_results, plot_results
 
 logging.basicConfig(level=logging.INFO)
 
