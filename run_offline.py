@@ -67,7 +67,7 @@ if __name__ == '__main__':
     logging.info('Done')
 
     if args.jacquard_output:
-        jo_fn = network + 'jacquard_output.txt'
+        jo_fn = 'jacquard_output.txt'
         with open(jo_fn, 'w') as f:
             pass
     # Get the compute device
