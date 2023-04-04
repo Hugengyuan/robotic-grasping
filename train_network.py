@@ -258,32 +258,46 @@ def run():
                       include_depth=args.use_depth,
                       include_rgb=args.use_rgb)
     logging.info('Dataset size is {}'.format(dataset.length))
-
+    
     # Creating data indices for training and validation splits
     indices = list(range(dataset.length))
+    split = int(np.floor(args.split * dataset.length))
+    if args.ds_shuffle:
+        np.random.seed(args.random_seed)
+        np.random.shuffle(indices)
+    train_indices, val_indices = indices[:split], indices[split:]
+    logging.info('Training size: {}'.format(len(train_indices)))
+    logging.info('Validation size: {}'.format(len(val_indices)))
+
+    # Creating data samplers and loaders
+    train_sampler = torch.utils.data.sampler.SubsetRandomSampler(train_indices)
+    val_sampler = torch.utils.data.sampler.SubsetRandomSampler(val_indices)
+    
+    # Creating data indices for training and validation splits
+#     indices = list(range(dataset.length))
 #     split = int(np.floor(args.split * dataset.length))
 #     if args.ds_shuffle:
 #         np.random.seed(args.random_seed)
 #         np.random.shuffle(indices)
 #     train_indices, val_indices = indices[:split], indices[split:]
     
-    kf = KFold(n_splits=5, random_state=42, shuffle=True)  # 初始化KFold
-    for train_indices , val_indices in kf.split(indices):  # 调用split方法切分数据
-        logging.info('train_index:%s {}'.format(len(train_indices)))
-        logging.info('test_index:%s {}'.format(len(val_indices)))
+#     kf = KFold(n_splits=5, random_state=42, shuffle=True)  # 初始化KFold
+#     for train_indices , val_indices in kf.split(indices):  # 调用split方法切分数据
+#         logging.info('train_index:%s {}'.format(len(train_indices)))
+#         logging.info('test_index:%s {}'.format(len(val_indices)))
     
-    train_files = []   # 存放5折的训练集划分
-    test_files = []     # # 存放5折的测试集集划分
-    for k, (Trindex, Tsindex) in enumerate(kf.split(indices)):
-        train_files.append(np.array(indices)[Trindex].tolist())
-        test_files.append(np.array(indices)[Tsindex].tolist())
+#     train_files = []   # 存放5折的训练集划分
+#     test_files = []     # # 存放5折的测试集集划分
+#     for k, (Trindex, Tsindex) in enumerate(kf.split(indices)):
+#         train_files.append(np.array(indices)[Trindex].tolist())
+#         test_files.append(np.array(indices)[Tsindex].tolist())
 
-#     logging.info('Training size: {}'.format(len(train_indices[0])))
-#     logging.info('Validation size: {}'.format(len(val_indices[0])))
+# #     logging.info('Training size: {}'.format(len(train_indices[0])))
+# #     logging.info('Validation size: {}'.format(len(val_indices[0])))
 
-    # Creating data samplers and loaders
-    train_sampler = torch.utils.data.sampler.SubsetRandomSampler(train_files[2])
-    val_sampler = torch.utils.data.sampler.SubsetRandomSampler(test_files[2])
+#     # Creating data samplers and loaders
+#     train_sampler = torch.utils.data.sampler.SubsetRandomSampler(train_files[2])
+#     val_sampler = torch.utils.data.sampler.SubsetRandomSampler(test_files[2])
 
     train_data = torch.utils.data.DataLoader(
         dataset,
