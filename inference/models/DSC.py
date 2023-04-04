@@ -90,22 +90,41 @@ class SpatialAttention(nn.Module):
         return torch.mul(x, out)
 
 
-class CBAMC3(nn.Module):
-    # CSP Bottleneck with 3 convolutions
-    def __init__(self, c1, c2, n=1, shortcut=True, g=1, e=0.5):  # ch_in, ch_out, number, shortcut, groups, expansion
-        super(CBAMC3, self).__init__()
-        c_ = int(c2 * e)  # hidden channels
-        self.cv1 = Conv(c1, c_, 1, 1)
-        self.cv2 = Conv(c1, c_, 1, 1)
-        self.cv3 = Conv(2 * c_, c2, 1)
-        self.m = nn.Sequential(*[Bottleneck(c_, c_, shortcut, g, e=1.0) for _ in range(n)])
-        self.channel_attention = ChannelAttention(c2, 16)
-        self.spatial_attention = SpatialAttention(7)
-
+class CBAMLayer(nn.Module):
+    def __init__(self, channel, reduction=16, spatial_kernel=7):
+        super(CBAMLayer, self).__init__()
+ 
+        # channel attention 压缩H,W为1
+        self.max_pool = nn.AdaptiveMaxPool2d(1)
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+ 
+        # shared MLP
+        self.mlp = nn.Sequential(
+            # Conv2d比Linear方便操作
+            # nn.Linear(channel, channel // reduction, bias=False)
+            nn.Conv2d(channel, channel // reduction, 1, bias=False),
+            # inplace=True直接替换，节省内存
+            nn.ReLU(inplace=True),
+            # nn.Linear(channel // reduction, channel,bias=False)
+            nn.Conv2d(channel // reduction, channel, 1, bias=False)
+        )
+ 
+        # spatial attention
+        self.conv = nn.Conv2d(2, 1, kernel_size=spatial_kernel,
+                              padding=spatial_kernel // 2, bias=False)
+        self.sigmoid = nn.Sigmoid()
+ 
     def forward(self, x):
-   		# 将最后的标准卷积模块改为了注意力机制提取特征
-        return self.spatial_attention(
-            self.channel_attention(self.cv3(torch.cat((self.m(self.cv1(x)), self.cv2(x)), dim=1))))
+        max_out = self.mlp(self.max_pool(x))
+        avg_out = self.mlp(self.avg_pool(x))
+        channel_out = self.sigmoid(max_out + avg_out)
+        x = channel_out * x
+ 
+        max_out, _ = torch.max(x, dim=1, keepdim=True)
+        avg_out = torch.mean(x, dim=1, keepdim=True)
+        spatial_out = self.sigmoid(self.conv(torch.cat([max_out, avg_out], dim=1)))
+        x = spatial_out * x
+        return x
 
     
 class DSC_Module(nn.Module):
@@ -120,7 +139,7 @@ class DSC_Module(nn.Module):
         self.relu2 = nn.ReLU(True)
         self.attention = attention
         if self.attention:
-            self.attention_layer = CBAMC3(in_channels, in_channels)
+            self.attention_layer = CBAMLayer(in_channels, in_channels)
 
     def forward(self, x):
         if self.attention:
