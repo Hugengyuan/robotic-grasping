@@ -139,7 +139,7 @@ class DSC_Module(nn.Module):
         self.relu2 = nn.ReLU(True)
         self.attention = attention
         if self.attention:
-            self.attention_layer = CBAMLayer(in_channels, in_channels)
+            self.attention_layer = CBAMLayer(in_channels)
 
     def forward(self, x):
         if self.attention:
