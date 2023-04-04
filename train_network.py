@@ -268,8 +268,10 @@ def run():
         np.random.seed(args.random_seed)
         np.random.shuffle(indices)
     train_indices, val_indices = indices[:split], indices[split:]
-#     logging.info('Training size: {}'.format(len(train_indices[1])))
-#     logging.info('Validation size: {}'.format(len(val_indices[1])))
+    logging.info('Training size: {}'.format(len(train_indices)))
+    logging.info('Validation size: {}'.format(len(val_indices)))
+
+    # Creating data samplers and loaders
     train_sampler = torch.utils.data.sampler.SubsetRandomSampler(train_indices)
     val_sampler = torch.utils.data.sampler.SubsetRandomSampler(val_indices)
     
