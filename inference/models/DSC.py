@@ -59,7 +59,7 @@ def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1, 
                      padding=padding, dilation=dilation, groups=groups, bias_attr=False)
 
 
-class SEWeightModule(nn.Layer):
+class SEWeightModule(nn.Module):
 
     def __init__(self, channels, reduction=16):
         super(SEWeightModule, self).__init__()
@@ -79,7 +79,7 @@ class SEWeightModule(nn.Layer):
         return weight
 
 
-class PSAModule(nn.Layer):
+class PSAModule(nn.Module):
 
     def __init__(self, inplans, planes, conv_kernels=[3, 5, 7, 9], stride=1, conv_groups=[1, 4, 8, 16]):
         super(PSAModule, self).__init__()
