@@ -128,7 +128,7 @@ class PSAModule(nn.Layer):
         return out
 
 class DSC_Module(nn.Module):
-    def __init__(self, in_channels, out_channels, attention=1, alpha=1.0):
+    def __init__(self, in_channels, out_channels, attention=0, alpha=1.0):
         super(DSC_Module, self).__init__()
         self.out_channels = out_channels
         self.irnn1 = Spacial_IRNN(self.out_channels, alpha)
@@ -140,7 +140,7 @@ class DSC_Module(nn.Module):
         self.relu2 = nn.ReLU(True)
         self.attention = attention
         if self.attention:
-            self.attention_layer = 
+            self.attention_layer = Attention(in_channels)
 
     def forward(self, x):
         if self.attention:
