@@ -9,9 +9,9 @@ class GenerativeResnet(GraspModel):
     def __init__(self, input_channels=4, output_channels=1, channel_size=32, dropout=False, prob=0.0):
         super(GenerativeResnet, self).__init__()
         self.conv1 = nn.Conv2d(input_channels, channel_size * 2, kernel_size=3, stride=1, padding=1)
-        self.bn1 = nn.BatchNorm2d(channel_size  * 2)
-        self.conv1_dsc = DSC_Module(channel_size  * 2, channel_size  * 2)
-        self.conv2 = nn.Conv2d(channel_size, channel_size * 2, kernel_size=4, stride=2, padding=1)
+        self.bn1 = nn.BatchNorm2d(channel_size * 2)
+        self.conv1_dsc = DSC_Module(channel_size * 2, channel_size  * 2)
+        self.conv2 = nn.Conv2d(channel_size * 2, channel_size * 2, kernel_size=4, stride=2, padding=1)
         self.bn2 = nn.BatchNorm2d(channel_size * 2)
         self.conv2_dsc = DSC_Module(channel_size * 2, channel_size * 2)
         self.conv3 = nn.Conv2d(channel_size * 2, channel_size * 4, kernel_size=4, stride=2, padding=1)
