@@ -8,9 +8,9 @@ class GenerativeResnet(GraspModel):
 
     def __init__(self, input_channels=4, output_channels=1, channel_size=32, dropout=False, prob=0.0):
         super(GenerativeResnet, self).__init__()
-        self.conv1 = nn.Conv2d(input_channels, channel_size, kernel_size=9, stride=1, padding=4)
-        self.bn1 = nn.BatchNorm2d(channel_size)
-        self.conv1_dsc = DSC_Module(channel_size, channel_size)
+        self.conv1 = nn.Conv2d(input_channels, channel_size * 2, kernel_size=3, stride=1, padding=1)
+        self.bn1 = nn.BatchNorm2d(channel_size  * 2)
+        self.conv1_dsc = DSC_Module(channel_size  * 2, channel_size  * 2)
         self.conv2 = nn.Conv2d(channel_size, channel_size * 2, kernel_size=4, stride=2, padding=1)
         self.bn2 = nn.BatchNorm2d(channel_size * 2)
         self.conv2_dsc = DSC_Module(channel_size * 2, channel_size * 2)
@@ -26,9 +26,9 @@ class GenerativeResnet(GraspModel):
         self.conv4 = nn.ConvTranspose2d(channel_size * 8, channel_size * 2, kernel_size=4, stride=2, padding=1)
         self.bn4 = nn.BatchNorm2d(channel_size * 2)
 
-        self.conv5 = nn.ConvTranspose2d(channel_size * 4, channel_size, kernel_size=4, stride=2, padding=1)
-        self.bn5 = nn.BatchNorm2d(channel_size)
-        self.conv6 = nn.ConvTranspose2d(channel_size * 2, channel_size, kernel_size=10, stride=1, padding=4)
+        self.conv5 = nn.ConvTranspose2d(channel_size * 4, channel_size  * 2, kernel_size=4, stride=2, padding=1)
+        self.bn5 = nn.BatchNorm2d(channel_size  * 2)
+        self.conv6 = nn.ConvTranspose2d(channel_size * 4, channel_size, kernel_size=3, stride=1, padding=1)
 
         self.pos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
         self.cos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
