@@ -55,7 +55,7 @@ class Attention(nn.Module):
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1, groups=1):
     """standard convolution with padding"""
-    return nn.Conv2D(in_planes, out_planes, kernel_size=kernel_size, stride=stride,
+    return nn.Conv2d(in_planes, out_planes, kernel_size=kernel_size, stride=stride,
                      padding=padding, dilation=dilation, groups=groups, bias_attr=False)
 
 
