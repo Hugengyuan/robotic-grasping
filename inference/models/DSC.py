@@ -56,7 +56,7 @@ class Attention(nn.Module):
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1, groups=1):
     """standard convolution with padding"""
     return nn.Conv2d(in_planes, out_planes, kernel_size=kernel_size, stride=stride,
-                     padding=padding, dilation=dilation, groups=groups, bias_attr=False)
+                     padding=padding, dilation=dilation, groups=groups, bias=False)
 
 
 class SEWeightModule(nn.Module):
@@ -103,7 +103,7 @@ class PSAModule(nn.Module):
         x3 = self.conv_3(x)
         x4 = self.conv_4(x)
 
-        feats = paddle.concat((x1, x2, x3, x4), axis=1)
+        feats = torch.concat((x1, x2, x3, x4), axis=1)
         feats = feats.reshape([batch_size, 4, self.split_channel, feats.shape[2], feats.shape[3]])
         
         # stage 2
@@ -123,7 +123,7 @@ class PSAModule(nn.Module):
             if i == 0:
                 out = x_se_weight_fp
             else:
-                out = paddle.concat((x_se_weight_fp, out), axis=1)
+                out = torch.concat((x_se_weight_fp, out), axis=1)
 
         return out
 
