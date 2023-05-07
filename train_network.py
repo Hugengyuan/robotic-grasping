@@ -12,7 +12,6 @@ import torch
 import torch.optim as optim
 import torch.utils.data
 from torchsummary import summary
-from sklearn.model_selection import KFold
 
 from hardware.device import get_device
 from inference.models import get_network
