@@ -321,7 +321,7 @@ def run():
     logging.info('Done')
 
     if args.optim.lower() == 'adam':
-        optimizer = optim.Adam(net.parameters())
+        optimizer = optim.Adam(net.parameters(), weight_decay=1e-4)
     elif args.optim.lower() == 'sgd':
         optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
     else:
